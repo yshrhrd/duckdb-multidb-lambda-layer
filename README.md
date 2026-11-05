@@ -8,6 +8,7 @@ AWS Lambda Layer (Python) containing `duckdb` and these extensions:
 | `postgres` | core | PostgreSQL |
 | `mysql` | core | MySQL / MariaDB |
 | `httpfs` | core | HTTP(S) / S3 file access |
+| `aws` | core | AWS credential chain (Lambda IAM role) for S3 |
 
 No ODBC driver, libpq, or libmysqlclient is needed. A SQL Server-only variant is available in [duckdb-mssql-lambda-layer](https://github.com/yshrhrd/duckdb-mssql-lambda-layer).
 
@@ -55,13 +56,14 @@ con = duckdb.connect(config={
     "autoinstall_known_extensions": False,
     "autoload_known_extensions": False,
 })
-for ext in ("mssql", "postgres", "mysql", "httpfs"):
+for ext in ("mssql", "postgres", "mysql", "httpfs", "aws"):
     con.execute(f"LOAD {ext}")
 
 con.execute("ATTACH 'host=... user=... password=... dbname=...' AS pg (TYPE postgres)")
 con.execute("ATTACH 'host=... user=... password=... database=...' AS my (TYPE mysql)")
 con.execute("ATTACH 'Server=host,1433;Database=db;User Id=u;Password=p;Encrypt=yes' AS ms (TYPE mssql)")
-print(con.execute("SELECT * FROM read_csv('https://example.com/data.csv') LIMIT 5").fetchall())
+con.execute("CREATE SECRET (TYPE s3, PROVIDER credential_chain)")  # uses the Lambda execution role
+print(con.execute("SELECT * FROM read_csv('s3://your-bucket/data.csv') LIMIT 5").fetchall())
 ```
 
 Extensions are built for a specific DuckDB version; rebuild the layer when upgrading duckdb.

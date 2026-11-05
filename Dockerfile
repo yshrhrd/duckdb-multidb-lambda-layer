@@ -10,15 +10,15 @@ RUN if [ -n "$DUCKDB_VERSION" ]; then spec="duckdb==$DUCKDB_VERSION"; else spec=
     && pip3 install "$spec" --upgrade --no-cache-dir --only-binary=:all: --target /opt/python
 
 # Pre-install extensions (none need ODBC/libpq/libmysqlclient at runtime):
-#   core:      postgres, mysql, httpfs
+#   core:      postgres, mysql, httpfs, aws
 #   community: mssql (native TDS)
 # Lambda's filesystem is read-only except /tmp, so extensions are bundled in the layer.
 RUN PYTHONPATH=/opt/python python -c "\
 import duckdb; \
 con = duckdb.connect(config={'extension_directory': '/opt/duckdb_extensions'}); \
-[con.execute(f'INSTALL {e}') for e in ('postgres', 'mysql', 'httpfs')]; \
+[con.execute(f'INSTALL {e}') for e in ('postgres', 'mysql', 'httpfs', 'aws')]; \
 con.execute('INSTALL mssql FROM community'); \
-[con.execute(f'LOAD {e}') for e in ('postgres', 'mysql', 'httpfs', 'mssql')]; \
+[con.execute(f'LOAD {e}') for e in ('postgres', 'mysql', 'httpfs', 'aws', 'mssql')]; \
 print('duckdb', duckdb.__version__)"
 # Reduce layer size
 RUN find /opt/python -type d -name __pycache__ -prune -exec rm -rf {} + \

@@ -67,7 +67,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
           body: |
-            # DuckDB + mssql/postgres/mysql/httpfs extensions Lambda Layer
+            # DuckDB + mssql/postgres/mysql/httpfs/aws extensions Lambda Layer
 
             > [!IMPORTANT]
             > Connect with `extension_directory=/opt/duckdb_extensions` and `home_directory=/tmp` before `LOAD mssql`.

@@ -3,7 +3,7 @@ import sys
 sys.path.append('/opt/python')
 
 EXT_DIR = '/opt/duckdb_extensions'
-EXTENSIONS = ['mssql', 'postgres', 'mysql', 'httpfs']
+EXTENSIONS = ['mssql', 'postgres', 'mysql', 'httpfs', 'aws']
 
 
 def _connect():
@@ -24,9 +24,12 @@ def test_extensions_load_offline():
     con = _connect()
     for ext in EXTENSIONS:
         con.execute(f'LOAD {ext}')
+    # duckdb reports some extensions under their internal names
     loaded = {
-        r[0] for r in con.execute(
-            'SELECT extension_name FROM duckdb_extensions() WHERE loaded'
+        n
+        for name, aliases in con.execute(
+            'SELECT extension_name, aliases FROM duckdb_extensions() WHERE loaded'
         ).fetchall()
+        for n in [name, *aliases]
     }
     assert set(EXTENSIONS) <= loaded
