@@ -21,7 +21,7 @@ docker run --rm -v "$(pwd):/out" duckdb-multidb cp /layer.zip /out/duckdb-multid
 ```
 
 - `--platform linux/arm64` for arm64 layers.
-- `PYTHON_VERSION`: 3.12 – 3.14 (Amazon Linux 2023 based runtimes; 3.11 is Amazon Linux 2 and unsupported by recent duckdb wheels).
+- `PYTHON_VERSION`: 3.12 – 3.15 (3.15 is experimental until duckdb publishes cp315 wheels and the SAM build image exists; Amazon Linux 2023 based runtimes; 3.11 is Amazon Linux 2 and unsupported by recent duckdb wheels).
 - Optional `--build-arg DUCKDB_VERSION=1.4.4` to pin duckdb.
 
 ## Release
